@@ -13,9 +13,9 @@ const (
 )
 
 type ServerOptions struct {
-	Address string `json:"address"`
-	Port    int    `json:"port"`
-	Mode    string `json:"mode"`
+	Address string `json:"address" yaml:"address"`
+	Port    int    `json:"port" yaml:"port"`
+	Mode    string `json:"mode" yaml:"mode"`
 	//Middlewares []string `json:"middlewares"`
 }
 

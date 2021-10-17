@@ -6,10 +6,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/spf13/viper"
+
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 )
 
 type App struct {
@@ -53,10 +54,7 @@ func WithRunFunc(run RunFunc) Option {
 // NewApp
 // 函数式选项模式，适用于参数比较复杂，有清晰默认值的场景，同时让参数可选更方便后续拓展
 func NewApp(name string, opts ...Option) *App {
-	app := &App{
-		name: name,
-	}
-
+	app := &App{name: name}
 	for _, opt := range opts {
 		opt(app)
 	}
@@ -82,11 +80,6 @@ func NewApp(name string, opts ...Option) *App {
 	_ = viper.BindPFlags(cmd.PersistentFlags())
 	addConfigFlags(app.name)
 
-	// TODO 如何让使用说明更加好看，可通过SetUsageFunc方法定制
-	// cmd.SetUsageFunc(func(command *cobra.Command) error {
-	// 	return nil
-	// })
-
 	if app.runFunc != nil {
 		cmd.RunE = app.runCommand
 	}
@@ -96,6 +89,14 @@ func NewApp(name string, opts ...Option) *App {
 }
 
 func (a *App) runCommand(cmd *cobra.Command, args []string) error {
+	if err := viper.BindPFlags(cmd.Flags()); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Error: failed to bind flags: %v\n", err)
+		return err
+	}
+	if err := viper.Unmarshal(a.options); err != nil {
+		_, _ = fmt.Fprintf(os.Stderr, "Error: failed to unmarshal configuration file: %v\n", err)
+		return err
+	}
 	return a.runFunc(a.name)
 }
 

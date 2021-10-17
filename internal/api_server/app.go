@@ -2,7 +2,6 @@ package api_server
 
 import (
 	"context"
-	"fmt"
 	"l-iam/internal/api_server/config"
 	"l-iam/internal/api_server/config/options"
 	"l-iam/pkg/app"
@@ -67,7 +66,6 @@ func (a *APIServer) Run() error {
 	// web run
 
 	// 启动rpc服务
-	fmt.Printf("come int run?")
 	if err := a.server.ListenAndServe(); err != nil {
 
 	}

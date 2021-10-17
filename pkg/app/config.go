@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
@@ -36,7 +35,6 @@ func addConfigFlags(name string) {
 			viper.AddConfigPath(filepath.Join("./configs", name))
 			home, _ := os.UserHomeDir()
 			viper.AddConfigPath(filepath.Join(home, name))
-
 			viper.SetConfigName(name)
 		}
 
