@@ -2,6 +2,13 @@
 
 > l-iam 是极客专栏 [Go语言项目开发实战](https://time.geekbang.org/column/intro/100079601) 的练习代码，专栏官方的项目仓库请参考 [marmotedu/iam](https://github.com/marmotedu/iam)   
 
+
+## 架构
+
+1. 通过web端请求api server对密钥/策略进行CRUD操作；
+2. api server收到请求后，除了自身会持久化数据，还会通过Redis发送SecretChanged/PolicyChanged消息
+3. authz server在启动的过程中会通过grpc接口向api server获取所有密钥和策略，同时会监听Redis，收到Changed消息后会重新同步密钥和策略消息
+
 ## 附录
 
 ### 阿里云RAM
