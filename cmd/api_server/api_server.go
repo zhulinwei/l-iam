@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	name    = "l-iam"
+	name    = "api-server"
 	version = "0.1.0"
 	desc    = `l-iam是极客时间专栏的学习项目，项目仅供学习，勿用于生产环境
 关于l-iam的更多详情，可以访问：

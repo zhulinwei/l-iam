@@ -13,7 +13,10 @@ import (
 
 var configFile string
 
-const FlagConfigFile = "apiserver.config"
+const (
+	RootDirEnv     = "IAM_ROOT_DIR"
+	FlagConfigFile = "apiserver.config"
+)
 
 func init() {
 	pflag.StringVarP(&configFile, FlagConfigFile, "c", configFile, "Read config from specified file")
@@ -32,10 +35,13 @@ func addConfigFlags(name string) {
 		} else {
 			// 依次使用默认的config file
 			viper.AddConfigPath(".")
-			viper.AddConfigPath(filepath.Join("./configs", name))
-			home, _ := os.UserHomeDir()
-			viper.AddConfigPath(filepath.Join(home, name))
-			viper.SetConfigName(name)
+			if rootDir := os.Getenv(RootDirEnv); rootDir != "" {
+				viper.AddConfigPath(filepath.Join(rootDir, "configs"))
+			}
+			//if home, err := os.UserHomeDir(); err != nil {
+			//viper.AddConfigPath(filepath.Join(home, "."+name))
+			//}
+			viper.SetConfigName(strings.NewReplacer(".", "_", "-", "_").Replace(name))
 		}
 
 		if err := viper.ReadInConfig(); err != nil {

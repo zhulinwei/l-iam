@@ -60,8 +60,11 @@ func NewApp(name string, opts ...Option) *App {
 	}
 
 	cmd := cobra.Command{
-		Use:     app.name,
-		Short:   app.name,
+		// 命名使用方式
+		Use: app.name,
+		// 输入help后的短描述
+		Short: app.name,
+		// 输入help后的长描述
 		Long:    app.desc,
 		Version: app.version,
 	}

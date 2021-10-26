@@ -4,6 +4,7 @@ import (
 	"context"
 	"l-iam/internal/api_server/config"
 	"l-iam/internal/api_server/config/options"
+	"l-iam/internal/api_server/dao"
 	"l-iam/pkg/app"
 	"net/http"
 	"os"
@@ -16,9 +17,10 @@ import (
 
 func Run(opts *options.Options) app.RunFunc {
 	return func(name string) error {
-		cfg := config.NewConfig(opts)
-		apiServer := NewAPIServer(cfg)
-		apiServer.PrepareRun()
+		apiServer := NewAPIServer(config.NewConfig(opts))
+		if err := apiServer.PrepareRun(); err != nil {
+			return err
+		}
 		apiServer.BeforeStop()
 		return apiServer.Run()
 	}
@@ -34,14 +36,18 @@ func NewAPIServer(cfg *config.Config) *APIServer {
 	return &APIServer{config: cfg}
 }
 
-func (a *APIServer) PrepareRun() {
+func (a *APIServer) PrepareRun() error {
+	// 使用mysql实现的存储层，如果有需求可以直接在此处替换其他实现
+	factory, err := dao.NewApiServerFactory(a.config.MySQL)
+	if err != nil {
+		return err
+	}
+
+	dao.SetClient(factory)
+
 	if a.route == nil {
 		a.route = gin.New()
 	}
-	a.route.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"code": "123"})
-	})
-
 	a.server = &http.Server{
 		// 监听的TCP地址
 		Addr: a.config.Server.Address + ":" + strconv.Itoa(a.config.Server.Port),
@@ -59,6 +65,7 @@ func (a *APIServer) PrepareRun() {
 
 	// 初始化数据库
 	// 初始化路由
+	return nil
 }
 
 func (a *APIServer) Run() error {

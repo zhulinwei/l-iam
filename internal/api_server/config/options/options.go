@@ -27,10 +27,10 @@ func NewOptions() *Options {
 
 func (o *Options) Flags() []*pflag.FlagSet {
 	var flags []*pflag.FlagSet
-	//flags = append(flags, o.Jwt.AddFlag())
-	//flags = append(flags, o.Grpc.AddFlag())
-	//flags = append(flags, o.MySQL.AddFlag())
-	//flags = append(flags, o.Redis.AddFlag())
+	flags = append(flags, o.Jwt.AddFlag())
+	flags = append(flags, o.Grpc.AddFlag())
+	flags = append(flags, o.MySQL.AddFlag())
+	flags = append(flags, o.Redis.AddFlag())
 	flags = append(flags, o.Server.AddFlag())
 
 	return flags
