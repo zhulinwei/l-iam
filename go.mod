@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/gin-gonic/gin v1.7.4 // indirect
+	github.com/google/uuid v1.1.2 // indirect
 	github.com/ory/ladon v1.2.0 // indirect
 	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect

@@ -10,18 +10,18 @@ import (
 
 // ------------- 定义dao接口 ----------
 
-var client IFactory
+var client Factory
 
-type IFactory interface {
-	Users() IUser
-	Policies() IPolicy
+type Factory interface {
+	Users() UserDao
+	Policies() PolicyDao
 }
 
-func Client() IFactory {
+func Client() Factory {
 	return client
 }
 
-func SetClient(factory IFactory) {
+func SetClient(factory Factory) {
 	client = factory
 }
 
@@ -34,16 +34,19 @@ type apiServerFactory struct {
 
 var once sync.Once
 
-func NewApiServerFactory(option *options.MySQLOptions) (IFactory, error) {
+func NewApiServerFactory(option *options.MySQLOptions) (Factory, error) {
 	var err error
 	var db *gorm.DB
 
 	once.Do(func() {
 		db, err = storge.New(storge.MySQLOptions{
-			Address:  option.Host,
-			Username: option.Username,
-			Password: option.Password,
-			Database: option.Database,
+			Address:               option.Host,
+			Username:              option.Username,
+			Password:              option.Password,
+			Database:              option.Database,
+			MaxOpenConnections:    option.MaxOpenConnections,
+			MaxIdleConnections:    option.MaxIdleConnections,
+			MaxConnectionLifeTime: option.MaxConnectionLifeTime,
 		})
 	})
 
@@ -54,10 +57,10 @@ func NewApiServerFactory(option *options.MySQLOptions) (IFactory, error) {
 	return &apiServerFactory{db: db}, nil
 }
 
-func (a *apiServerFactory) Users() IUser {
+func (a *apiServerFactory) Users() UserDao {
 	return NewUserDao(a.db)
 }
 
-func (a *apiServerFactory) Policies() IPolicy {
+func (a *apiServerFactory) Policies() PolicyDao {
 	return NewPolicyDao(a.db)
 }

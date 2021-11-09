@@ -36,3 +36,8 @@ func (a AuthzPolicy) Value() (value driver.Value, err error) {
 func (Policy) TableName() string {
 	return "policy"
 }
+
+func (p *Policy) Validate() error {
+	// todo 实现自定义校验
+	return nil
+}

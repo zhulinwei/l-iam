@@ -23,7 +23,9 @@ func init() {
 }
 
 func addConfigFlags(name string) {
+	// 使用环境变量
 	viper.AutomaticEnv()
+	// 设置环境变量前缀以方便区分
 	viper.SetEnvPrefix(strings.Replace(strings.ToUpper(name), "-", "_", -1))
 	// 奇数参数为旧字符串，偶数参数为新字符串
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
@@ -38,9 +40,9 @@ func addConfigFlags(name string) {
 			if rootDir := os.Getenv(RootDirEnv); rootDir != "" {
 				viper.AddConfigPath(filepath.Join(rootDir, "configs"))
 			}
-			//if home, err := os.UserHomeDir(); err != nil {
-			//viper.AddConfigPath(filepath.Join(home, "."+name))
-			//}
+			if home, err := os.UserHomeDir(); err != nil {
+				viper.AddConfigPath(filepath.Join(home, "."+name))
+			}
 			viper.SetConfigName(strings.NewReplacer(".", "_", "-", "_").Replace(name))
 		}
 

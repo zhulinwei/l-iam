@@ -1,16 +1,24 @@
 package dao
 
-import "gorm.io/gorm"
+import (
+	"context"
+	"l-iam/internal/api_server/model"
 
-type IPolicy interface {
+	"gorm.io/gorm"
+)
+
+type PolicyDao interface {
+	Create(ctx context.Context, policy *model.Policy) error
 }
 
-type PolicyDao struct {
+type policyDao struct {
 	db *gorm.DB
 }
 
-func NewPolicyDao(db *gorm.DB) IPolicy {
-	return &PolicyDao{
-		db: db,
-	}
+func NewPolicyDao(db *gorm.DB) PolicyDao {
+	return &policyDao{db: db}
+}
+
+func (d *policyDao) Create(ctx context.Context, policy *model.Policy) error {
+	return d.db.Save(policy).Error
 }

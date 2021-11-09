@@ -2,9 +2,11 @@ package api_server
 
 import (
 	"context"
+	"fmt"
 	"l-iam/internal/api_server/config"
 	"l-iam/internal/api_server/config/options"
 	"l-iam/internal/api_server/dao"
+	"l-iam/internal/api_server/router"
 	"l-iam/pkg/app"
 	"net/http"
 	"os"
@@ -37,17 +39,24 @@ func NewAPIServer(cfg *config.Config) *APIServer {
 }
 
 func (a *APIServer) PrepareRun() error {
+	// 初始化数据库
 	// 使用mysql实现的存储层，如果有需求可以直接在此处替换其他实现
 	factory, err := dao.NewApiServerFactory(a.config.MySQL)
 	if err != nil {
 		return err
 	}
-
 	dao.SetClient(factory)
 
-	if a.route == nil {
-		a.route = gin.New()
-	}
+	// 初始化路由
+	a.route = gin.New()
+	router.InitV1Router(a.route)
+
+	return nil
+}
+
+func (a *APIServer) Run() error {
+	// grpc run
+	// web run
 	a.server = &http.Server{
 		// 监听的TCP地址
 		Addr: a.config.Server.Address + ":" + strconv.Itoa(a.config.Server.Port),
@@ -62,19 +71,9 @@ func (a *APIServer) PrepareRun() error {
 		// 请求头的最大字节数
 		MaxHeaderBytes: 1 << 20,
 	}
-
-	// 初始化数据库
-	// 初始化路由
-	return nil
-}
-
-func (a *APIServer) Run() error {
-	// grpc run
-	// web run
-
 	// 启动rpc服务
 	if err := a.server.ListenAndServe(); err != nil {
-
+		fmt.Println("err:", err.Error())
 	}
 	return nil
 }
