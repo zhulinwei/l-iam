@@ -11,8 +11,11 @@ import (
 func InitV1Router(g *gin.Engine) {
 
 	v1 := g.Group("v1")
+	v1.Use(middleware.RequestID())
 
-	policyCtrl := controller.NewPolicyController(dao.Client())
+	userCtrl := controller
+
+	policyCtrl := controller.NewPolicyCtrl(dao.Client())
 	policy := v1.Group("policies", middleware.Publish())
 
 	policy.GET("", nil)
