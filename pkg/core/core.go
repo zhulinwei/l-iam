@@ -1,10 +1,22 @@
 package core
 
 import (
-	"net/http"
+	"l-iam/pkg/code"
+	"l-iam/pkg/errors"
 
 	"github.com/gin-gonic/gin"
 )
+
+type ErrResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+type DataResponse struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data,omitempty"`
+}
 
 func Parse(ctx *gin.Context, uri, query, body interface{}) error {
 	if uri != nil {
@@ -25,11 +37,19 @@ func Parse(ctx *gin.Context, uri, query, body interface{}) error {
 	return nil
 }
 
-// todo
-func ResponseJson(ctx *gin.Context, statusCode int, body interface{}) {
-	ctx.JSON(statusCode, body)
+func ResponseErr(ctx *gin.Context, err error) {
+	coder := errors.ParseErrCode(err)
+	ctx.JSON(coder.HttpStatus(), ErrResponse{
+		Code:    coder.Code(),
+		Message: coder.Message(),
+	})
 }
 
-func ResponseTODO(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, nil)
+func ResponseJson(ctx *gin.Context, data interface{}) {
+	coder := code.SuccessCoder
+	ctx.JSON(coder.HttpStatus(), DataResponse{
+		Data:    data,
+		Code:    coder.Code(),
+		Message: coder.Message(),
+	})
 }
