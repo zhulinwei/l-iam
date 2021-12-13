@@ -1,26 +1,16 @@
 package router
 
 import (
-	"l-iam/internal/api_server/controller"
-	"l-iam/internal/api_server/dao"
+	"l-iam/internal/api_server/router/admin"
+	"l-iam/internal/api_server/router/api"
 	"l-iam/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func InitV1Router(g *gin.Engine) {
-
-	v1 := g.Group("v1")
-	v1.Use(middleware.RequestID())
-
-	userCtrl := controller
-
-	policyCtrl := controller.NewPolicyCtrl(dao.Client())
-	policy := v1.Group("policies", middleware.Publish())
-
-	policy.GET("", nil)
-	policy.POST("", policyCtrl.Create)
-	policy.GET(":name", nil)
-	policy.PUT(":name", nil)
-	policy.DELETE(":name", nil)
+func InitRouter(g *gin.Engine) {
+	g.Use(gin.Recovery()).
+		Use(middleware.Cors())
+	api.InitV1(g.Group("api"))
+	admin.InitV1(g.Group("admin"))
 }

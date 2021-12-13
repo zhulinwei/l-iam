@@ -2,12 +2,14 @@ package api_server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"l-iam/internal/api_server/config"
 	"l-iam/internal/api_server/config/options"
 	"l-iam/internal/api_server/dao"
 	"l-iam/internal/api_server/router"
 	"l-iam/pkg/app"
+	"l-iam/pkg/log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,11 +21,18 @@ import (
 
 func Run(opts *options.Options) app.RunFunc {
 	return func(name string) error {
+		log.Init(opts.Log)
+		defer log.Flush()
+		optsBytes, _ := json.Marshal(opts)
+		log.Info(string(optsBytes))
 		apiServer := NewAPIServer(config.NewConfig(opts))
 		if err := apiServer.PrepareRun(); err != nil {
 			return err
 		}
-		apiServer.BeforeStop()
+		// todo 有待思考合理性
+		if err := apiServer.BeforeStop(); err != nil {
+			return err
+		}
 		return apiServer.Run()
 	}
 }
@@ -48,8 +57,9 @@ func (a *APIServer) PrepareRun() error {
 	dao.SetClient(factory)
 
 	// 初始化路由
+	gin.SetMode(a.config.Server.Mode)
 	a.route = gin.New()
-	router.InitV1Router(a.route)
+	router.InitRouter(a.route)
 
 	return nil
 }
@@ -78,7 +88,7 @@ func (a *APIServer) Run() error {
 	return nil
 }
 
-func (a *APIServer) BeforeStop() {
+func (a *APIServer) BeforeStop() error {
 	// web close
 	// grpc close
 	// mysql close
@@ -92,4 +102,6 @@ func (a *APIServer) BeforeStop() {
 		if err := a.server.Shutdown(context.Background()); err != nil {
 		}
 	}()
+
+	return nil
 }

@@ -15,10 +15,11 @@ func RequestID() gin.HandlerFunc {
 
 		if requestID == "" {
 			requestID = uuid.New().String()
-			ctx.Request.Header.Set(XRequestIDKey, requestID)
 			ctx.Set(XRequestIDKey, requestID)
+			ctx.Request.Header.Set(XRequestIDKey, requestID)
 		}
 
+		// 把XRequestIDKey作为响应体的头部字段返回
 		ctx.Writer.Header().Set(XRequestIDKey, requestID)
 		ctx.Next()
 	}

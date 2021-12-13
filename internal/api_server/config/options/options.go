@@ -1,6 +1,10 @@
 package options
 
-import "github.com/spf13/pflag"
+import (
+	"l-iam/pkg/log"
+
+	"github.com/spf13/pflag"
+)
 
 type IOptions interface {
 	AddFlag() *pflag.FlagSet
@@ -8,6 +12,7 @@ type IOptions interface {
 
 // Options 配置：用来构建命令行参数，它的值来自于命令行选项或者配置文件
 type Options struct {
+	Log    *log.Options   `json:"log"`
 	Jwt    *JwtOptions    `json:"jwt"`
 	Grpc   *GRPCOptions   `json:"grpc"`
 	MySQL  *MySQLOptions  `json:"mysql"`
@@ -17,6 +22,7 @@ type Options struct {
 
 func NewOptions() *Options {
 	return &Options{
+		Log:    log.NewOptions(),
 		Jwt:    NewJwtOptions(),
 		Grpc:   NewGRPCOptions(),
 		MySQL:  NewMySQLOptions(),
@@ -27,6 +33,7 @@ func NewOptions() *Options {
 
 func (o *Options) Flags() []*pflag.FlagSet {
 	var flags []*pflag.FlagSet
+	flags = append(flags, o.Log.AddFlags())
 	flags = append(flags, o.Jwt.AddFlag())
 	flags = append(flags, o.Grpc.AddFlag())
 	flags = append(flags, o.MySQL.AddFlag())

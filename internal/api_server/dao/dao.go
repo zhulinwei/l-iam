@@ -2,6 +2,8 @@ package dao
 
 import (
 	"l-iam/internal/api_server/config/options"
+	v1 "l-iam/internal/pkg/model/api_server/v1"
+	"l-iam/pkg/log"
 	"l-iam/pkg/storge"
 	"sync"
 
@@ -48,12 +50,16 @@ func NewApiServerFactory(option *options.MySQLOptions) (Factory, error) {
 			MaxIdleConnections:    option.MaxIdleConnections,
 			MaxConnectionLifeTime: option.MaxConnectionLifeTime,
 		})
+
 	})
 
 	if err != nil {
 		return nil, err
 	}
-
+	err = db.AutoMigrate(&v1.Policy{})
+	if err != nil {
+		log.Info(err.Error())
+	}
 	return &apiServerFactory{db: db}, nil
 }
 

@@ -16,15 +16,13 @@ type ServerOptions struct {
 	Address string `json:"address" yaml:"address"`
 	Port    int    `json:"port" yaml:"port"`
 	Mode    string `json:"mode" yaml:"mode"`
-	//Middlewares []string `json:"middlewares"`
 }
 
 func NewServerOptions() *ServerOptions {
 	return &ServerOptions{
 		Address: "0.0.0.0",
 		Port:    8080,
-		Mode:    gin.ReleaseMode,
-		//Middlewares: []string{},
+		Mode:    gin.DebugMode,
 	}
 }
 

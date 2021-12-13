@@ -26,6 +26,7 @@ func main() {
 		app.WithDesc(desc),
 		app.WithOptions(opts),
 		app.WithVersion(version),
+		// api_server.Run返回的func作为app的属性，在app构建完成执行Run方法后执行func
 		app.WithRunFunc(api_server.Run(opts)),
 	).Run()
 }
